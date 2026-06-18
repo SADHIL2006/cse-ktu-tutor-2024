@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface AskRequest {
+  /**
+     * The student's question or topic
+     * @minLength 1
+     */
+  question: string;
 }

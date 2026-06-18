@@ -5,17 +5,6 @@
  * KTU AI Tutor API specification
  * OpenAPI spec version: 0.1.0
  */
-export interface HealthStatus {
-  status: string;
-}
-
-export interface AskRequest {
-  /**
-     * The student's question or topic
-     * @minLength 1
-     */
-  question: string;
-}
 
 export interface AskResponse {
   /** The AI tutor's response */
@@ -23,8 +12,3 @@ export interface AskResponse {
   /** Which agent handled the question (e.g. "AI Tutor", "Notes Finder") */
   agent_used: string;
 }
-
-export interface ErrorResponse {
-  detail: string;
-}
-

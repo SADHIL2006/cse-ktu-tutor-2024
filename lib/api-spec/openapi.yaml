@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: KTU AI Tutor API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: tutor
+    description: AI Tutor operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /ask:
+    post:
+      operationId: askTutor
+      tags: [tutor]
+      summary: Ask the AI tutor a question
+      description: >
+        Sends a question through the LangGraph multi-agent pipeline.
+        The router automatically selects the best agent (tutor, notes finder,
+        practice generator, study planner, or quiz generator).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AskRequest"
+      responses:
+        "200":
+          description: AI tutor response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AskResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +69,31 @@ components:
           type: string
       required:
         - status
-
+    AskRequest:
+      type: object
+      properties:
+        question:
+          type: string
+          description: The student's question or topic
+          minLength: 1
+      required:
+        - question
+    AskResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+          description: The AI tutor's response
+        agent_used:
+          type: string
+          description: Which agent handled the question (e.g. "AI Tutor", "Notes Finder")
+      required:
+        - answer
+        - agent_used
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+      required:
+        - detail
