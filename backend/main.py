@@ -2,10 +2,12 @@
 KTU AI Tutor - FastAPI Backend
 ================================
 FastAPI server that exposes the LangGraph tutor logic via REST API.
+In production, also serves the built React frontend as static files.
 """
 
 import os
 import sys
+from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -14,6 +16,8 @@ load_dotenv()
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 app = FastAPI(
@@ -59,6 +63,20 @@ def ask(request: AskRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+STATIC_DIR = Path(__file__).parent.parent / "artifacts" / "ai-tutor" / "dist" / "public"
+
+if STATIC_DIR.exists():
+    app.mount("/assets", StaticFiles(directory=str(STATIC_DIR / "assets")), name="assets")
+
+    @app.get("/favicon.svg")
+    async def favicon():
+        return FileResponse(str(STATIC_DIR / "favicon.svg"))
+
+    @app.get("/{full_path:path}")
+    async def serve_react(full_path: str):
+        return FileResponse(str(STATIC_DIR / "index.html"))
 
 
 if __name__ == "__main__":
