@@ -1,5 +1,2 @@
-import { createRoot } from "react-dom/client";
-import App from "./App";
-import "./index.css";
-
-createRoot(document.getElementById("root")!).render(<App />);
+// Frontend replaced with plain HTML/CSS/JS in index.html
+export {};

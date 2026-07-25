@@ -65,18 +65,18 @@ def ask(request: AskRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-STATIC_DIR = Path(__file__).parent.parent / "artifacts" / "ai-tutor" / "dist" / "public"
+STATIC_DIR = Path(__file__).parent / "static"
 
-if STATIC_DIR.exists():
-    app.mount("/assets", StaticFiles(directory=str(STATIC_DIR / "assets")), name="assets")
+@app.get("/")
+async def serve_index():
+    return FileResponse(str(STATIC_DIR / "index.html"))
 
-    @app.get("/favicon.svg")
-    async def favicon():
-        return FileResponse(str(STATIC_DIR / "favicon.svg"))
-
-    @app.get("/{full_path:path}")
-    async def serve_react(full_path: str):
-        return FileResponse(str(STATIC_DIR / "index.html"))
+@app.get("/{full_path:path}")
+async def serve_fallback(full_path: str):
+    # API routes are handled above; everything else gets the SPA
+    if full_path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="Not found")
+    return FileResponse(str(STATIC_DIR / "index.html"))
 
 
 if __name__ == "__main__":
